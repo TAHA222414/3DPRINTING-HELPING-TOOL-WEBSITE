@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Moon, Sun } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import MaterialSelector, { MATERIAL_PRESETS } from "@/components/MaterialSelector";
 import DiameterToggle from "@/components/DiameterToggle";
 import InputSection from "@/components/InputSection";
@@ -8,7 +8,6 @@ import SpoolTracker from "@/components/SpoolTracker";
 import ResultsPanel from "@/components/ResultsPanel";
 
 export default function Calculator() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMaterial, setSelectedMaterial] = useState("PLA");
   const [customDensity, setCustomDensity] = useState(1.24);
   const [diameter, setDiameter] = useState(1.75);
@@ -18,18 +17,6 @@ export default function Calculator() {
   const [costPerKg, setCostPerKg] = useState("20");
   const [grossWeight, setGrossWeight] = useState("");
   const [tareWeight, setTareWeight] = useState("");
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
   const getDensity = () => {
     if (selectedMaterial === "custom") return customDensity;
@@ -107,46 +94,22 @@ export default function Calculator() {
   const results = calculateResults();
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-primary-foreground rounded-full" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Filament Calculator</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">
-                3D Printing Metrics Tool
-              </p>
-            </div>
+    <div className="bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">Filament Calculator</h1>
+            <p className="text-muted-foreground">Calculate your 3D printing metrics</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              data-testid="button-theme-toggle"
-            >
-              {theme === "light" ? (
-                <Moon className="w-5 h-5" />
-              ) : (
-                <Sun className="w-5 h-5" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReset}
-              data-testid="button-reset"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleReset}
+            data-testid="button-reset"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </Button>
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <div className="bg-card border rounded-lg p-6 space-y-6">
@@ -190,16 +153,7 @@ export default function Calculator() {
             />
           </div>
         </div>
-
-        <footer className="mt-12 pt-6 border-t text-center text-sm text-muted-foreground">
-          <p>
-            Using formula: Volume = π(d/2)² × L | Mass = ρ × V
-          </p>
-          <p className="mt-2 text-xs">
-            Material densities may vary by brand. Adjust custom density as needed.
-          </p>
-        </footer>
-      </main>
+      </div>
     </div>
   );
 }
