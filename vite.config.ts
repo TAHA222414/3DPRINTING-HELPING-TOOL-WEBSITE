@@ -26,11 +26,15 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
+  // The React app source lives in /client
   root: path.resolve(import.meta.dirname, "client"),
+
+  // ⬇️ IMPORTANT: build output goes to server/public
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "server", "public"),
     emptyOutDir: true,
   },
+
   server: {
     fs: {
       strict: true,
