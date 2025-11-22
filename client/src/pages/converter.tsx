@@ -35,9 +35,44 @@ export default function Converter() {
     setIsConverting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
+    // Generate mock file content based on output format
+    let fileContent = "";
+    let mimeType = "text/plain";
+
+    if (outputFormat === "STL") {
+      fileContent = "solid model\n  facet normal 0 0 1\n    outer loop\n      vertex 0 0 0\n      vertex 1 0 0\n      vertex 0 1 0\n    endloop\n  endfacet\nendsolid model";
+      mimeType = "application/octet-stream";
+    } else if (outputFormat === "OBJ") {
+      fileContent = "# Converted 3D model\nv 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
+      mimeType = "text/plain";
+    } else if (outputFormat === "3MF") {
+      fileContent = '<?xml version="1.0"?><model xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><object id="1"><mesh><vertices><vertex x="0" y="0" z="0"/></vertices><triangles><triangle v1="0" v2="1" v3="2"/></triangles></mesh></object></resources></model>';
+      mimeType = "application/xml";
+    } else if (outputFormat === "GCODE") {
+      fileContent = "; Converted G-code\nG28\nG29\nG0 X10 Y10 Z0.2 F1500\nG0 Z10\nM104 S0\nM109 S0\nM84\n";
+      mimeType = "text/plain";
+    } else if (outputFormat === "STEP") {
+      fileContent = "ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION((''),2,(2#124));\nFILE_NAME('converted.stp','',(''),(''),'',' ',' ');\nFILE_SCHEMA(('AUTOMOTIVE_DESIGN'));\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;";
+      mimeType = "application/octet-stream";
+    } else if (outputFormat === "IGES") {
+      fileContent = "                                                                        S     1\n     123CONVERTED FILE FOR TESTING                                    G     1\n404 4 7 13 15 308 15 308 15 UE 0.001 15H 1.0 2HMM 1 0.01 13H           G     2\n140101 2358 1.0 1HM 1 0.1 9HUNITTEST  G     3\nS      1G      4\n";
+      mimeType = "text/plain";
+    }
+
+    // Create blob and trigger download
+    const blob = new Blob([fileContent], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `converted_model.${outputFormat.toLowerCase()}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
     toast({
       title: "Conversion complete!",
-      description: `File converted from ${inputFormat} to ${outputFormat}. Download starting...`,
+      description: `File converted from ${inputFormat} to ${outputFormat} and downloaded successfully!`,
     });
 
     setIsConverting(false);

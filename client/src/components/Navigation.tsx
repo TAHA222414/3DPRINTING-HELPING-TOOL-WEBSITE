@@ -21,9 +21,6 @@ export default function Navigation({ theme, onThemeToggle }: NavigationProps) {
   ];
 
   const isActive = (href: string) => {
-    if (href === "/" || href === "/tools") {
-      return location === "/" || location === "/tools";
-    }
     return location === href;
   };
 

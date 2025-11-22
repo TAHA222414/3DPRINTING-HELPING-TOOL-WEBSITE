@@ -16,13 +16,111 @@ export default function Calibration() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
-  const handleGenerateGcode = async () => {
+  const generateGcode = (testType: "tower" | "linear") => {
+    const lines: string[] = [];
+    
+    // G-code header
+    lines.push("; Printer Calibration Test - " + (testType === "tower" ? "Calibration Tower" : "Linear Advance Test"));
+    lines.push(`; Steps/mm: ${stepsPerMm}`);
+    lines.push(`; Flow Rate: ${flowRate}%`);
+    lines.push(`; Nozzle Temp: ${nozzleTemp}°C`);
+    lines.push(`; Retraction: ${retraction}mm at ${retractionSpeed}mm/s`);
+    lines.push(";");
+    lines.push("G28 ; Home all axes");
+    lines.push("G29 ; Bed leveling");
+    
+    if (testType === "tower") {
+      // Calibration tower
+      lines.push(`;`);
+      lines.push(`; CALIBRATION TOWER TEST`);
+      lines.push(`;`);
+      lines.push(`M104 S${nozzleTemp} ; Set hotend temp`);
+      lines.push(`M140 S60 ; Set bed temp`);
+      lines.push("M109 S"+nozzleTemp+" ; Wait for hotend");
+      lines.push("M190 S60 ; Wait for bed");
+      lines.push("G0 F1500 ; Set speed");
+      lines.push(`;`);
+      lines.push("; Layer 1-10: Base test");
+      for (let i = 0; i < 10; i++) {
+        lines.push(`G0 X10 Y10 Z${(i * 0.2).toFixed(1)} ; Layer ${i + 1}`);
+        lines.push("G1 X50 Y50 E10 F1500");
+      }
+      lines.push(`;`);
+      lines.push("; Layer 11-20: Flow rate variation");
+      for (let i = 10; i < 20; i++) {
+        const flowVar = 95 + (i - 10) * 1;
+        lines.push(`; Flow: ${flowVar}%`);
+        lines.push(`G0 X10 Y70 Z${(i * 0.2).toFixed(1)}`);
+        lines.push("G1 X50 Y100 E10 F1500");
+      }
+      lines.push(`;`);
+      lines.push("; Layer 21-30: Temperature variation");
+      for (let i = 20; i < 30; i++) {
+        const tempVar = parseInt(nozzleTemp) + ((i - 20) * 2);
+        lines.push(`M104 S${tempVar} ; Temp: ${tempVar}°C`);
+        lines.push(`G0 X70 Y10 Z${(i * 0.2).toFixed(1)}`);
+        lines.push("G1 X100 Y50 E10 F1500");
+      }
+    } else {
+      // Linear advance test
+      lines.push(`;`);
+      lines.push(`; LINEAR ADVANCE TEST`);
+      lines.push(`;`);
+      lines.push(`M104 S${nozzleTemp}`);
+      lines.push(`M140 S60`);
+      lines.push("M109 S"+nozzleTemp);
+      lines.push("M190 S60");
+      lines.push(`;`);
+      lines.push("; Testing different K-values via speed changes");
+      lines.push("; Manual K value: adjust based on visible banding pattern");
+      lines.push(`;`);
+      const speeds = [30, 40, 50, 60, 70, 80, 90, 100];
+      for (let i = 0; i < speeds.length; i++) {
+        const speed = speeds[i];
+        lines.push(`; K-value test area ${i + 1} - Speed ${speed}mm/s`);
+        lines.push(`G0 X10 Y${10 + i * 15} Z0.2 F${speed * 60}`);
+        lines.push(`G1 X100 Y${10 + i * 15} E50 F${speed * 60}`);
+        lines.push(`G0 X100 Y${10 + i * 15 + 5}`);
+        lines.push(`G1 X10 Y${10 + i * 15 + 5} E50 F${speed * 60}`);
+      }
+    }
+    
+    lines.push(`;`);
+    lines.push("; Retraction test");
+    for (let i = 0; i < 5; i++) {
+      lines.push(`G0 X${20 + i * 20} Y120 Z0.2`);
+      lines.push(`G0 Z10 ; Lift`);
+      lines.push(`G0 X${30 + i * 20} Y120`);
+      lines.push(`G0 Z0.2 ; Lower`);
+    }
+    
+    lines.push(`;`);
+    lines.push("M104 S0 ; Turn off hotend");
+    lines.push("M140 S0 ; Turn off bed");
+    lines.push("M84 ; Disable motors");
+    lines.push("M107 ; Fan off");
+    
+    return lines.join("\n");
+  };
+
+  const handleGenerateGcode = async (testType: "tower" | "linear") => {
     setIsGenerating(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
+    const gcodeContent = generateGcode(testType);
+    const blob = new Blob([gcodeContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `calibration_${testType}_test.gcode`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
     toast({
       title: "G-code generated!",
-      description: "Calibration test file is ready for download.",
+      description: `Calibration ${testType === "tower" ? "tower" : "linear advance"} test file downloaded successfully!`,
     });
     setIsGenerating(false);
   };
@@ -143,7 +241,7 @@ export default function Calibration() {
                   </ul>
                 </div>
                 <Button
-                  onClick={handleGenerateGcode}
+                  onClick={() => handleGenerateGcode("tower")}
                   disabled={isGenerating}
                   className="w-full"
                   data-testid="button-generate-tower"
@@ -176,7 +274,7 @@ export default function Calibration() {
                   </ul>
                 </div>
                 <Button
-                  onClick={handleGenerateGcode}
+                  onClick={() => handleGenerateGcode("linear")}
                   disabled={isGenerating}
                   className="w-full"
                   data-testid="button-generate-linear"
