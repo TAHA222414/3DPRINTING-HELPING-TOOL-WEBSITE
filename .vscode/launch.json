@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "🟢 Dev (server + Tailwind)",
+      "configurations": ["Run Server", "Tailwind Watch"],
+      "preLaunchTask": "npm: build:css"
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Run Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Tailwind Watch",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run css:watch",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
