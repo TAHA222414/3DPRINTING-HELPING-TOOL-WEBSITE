@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { SiInstagram, SiFacebook, SiTiktok, SiX } from "react-icons/si";
+import { SiInstagram, SiFacebook, SiTiktok, SiX, SiYoutube } from "react-icons/si";
 
 export default function Footer() {
   const footerLinks = [
@@ -14,6 +14,7 @@ export default function Footer() {
     { href: "https://facebook.com", icon: SiFacebook, label: "Facebook", testId: "link-facebook" },
     { href: "https://tiktok.com", icon: SiTiktok, label: "TikTok", testId: "link-tiktok" },
     { href: "https://twitter.com", icon: SiX, label: "Twitter", testId: "link-twitter" },
+    { href: "https://youtube.com", icon: SiYoutube, label: "YouTube", testId: "link-youtube" },
   ];
 
   return (
