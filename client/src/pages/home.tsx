@@ -44,28 +44,28 @@ export default function Home() {
       excerpt: "Learn the basics of 3D printing, from choosing a printer to your first successful print.",
       date: "November 15, 2024",
       category: "Beginner",
-      href: "/blog/getting-started",
+      href: "/getting-started",
     },
     {
       title: "Advanced Filament Types Explained",
       excerpt: "Deep dive into different filament materials, their properties, and best use cases.",
       date: "November 10, 2024",
       category: "Materials",
-      href: "/blog/filament-types",
+      href: "/filament-types",
     },
     {
       title: "Troubleshooting Common Print Issues",
       excerpt: "Solutions for warping, layer adhesion, and other common 3D printing problems.",
       date: "November 5, 2024",
       category: "Troubleshooting",
-      href: "/blog/troubleshooting",
+      href: "/troubleshooting",
     },
     {
       title: "Optimizing Print Quality",
       excerpt: "Tips and tricks to achieve professional-quality prints with perfect surface finishes.",
       date: "October 30, 2024",
       category: "Tips",
-      href: "/blog/print-quality",
+      href: "/print-quality",
     },
   ];
 
