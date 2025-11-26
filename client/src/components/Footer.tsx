@@ -64,7 +64,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Filament Calculator. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} 3Dprintingtools. All rights reserved.</p>
           <p className="mt-2 text-xs">
             Using formula: Volume = π(d/2)² × L | Mass = ρ × V
           </p>
