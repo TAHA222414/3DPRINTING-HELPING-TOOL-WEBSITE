@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mail, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const FORMSPREE_URL = "https://formspree.io/f/xzzqlyvk"; 
+// ⬆️ IMPORTANT: replace this with your real Formspree URL
 
 export default function ContactForm() {
   const [name, setName] = useState("");
@@ -19,22 +28,49 @@ export default function ContactForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch(FORMSPREE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          message,
+        }),
+      });
 
-    console.log("About to show toast");
-    const result = toast({
-      title: "Message sent!",
-      description: "We'll get back to you as soon as possible.",
-    });
-    console.log("Toast called, result:", result);
+      if (response.ok) {
+        toast({
+          title: "Message sent! 🎉",
+          description: "We'll get back to you as soon as possible.",
+        });
 
-    // Reset form
-    setName("");
-    setEmail("");
-    setSubject("");
-    setMessage("");
-    setIsSubmitting(false);
+        // Reset form
+        setName("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again in a moment.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast({
+        title: "Network error",
+        description: "Could not send message. Check your connection.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -45,7 +81,8 @@ export default function ContactForm() {
           Contact Us
         </CardTitle>
         <CardDescription>
-          Have a question or feedback? Send us a message and we'll respond as soon as possible.
+          Have a question or feedback? Send us a message and we'll respond as
+          soon as possible.
         </CardDescription>
       </CardHeader>
       <CardContent>
